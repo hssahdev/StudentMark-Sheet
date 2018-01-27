@@ -93,6 +93,19 @@ public class StudentDataProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
+
+        database=studentDbHelper.getWritableDatabase();
+
+        switch (matcher.match(uri)){
+
+            case INDIVID_STUDENT :
+                long rowId = ContentUris.parseId(uri);
+                s= StudentContract.MarksEntry._ID+"=?";
+                strings=new String[]{String.valueOf(rowId)};
+                getContext().getContentResolver().notifyChange(uri,null);
+                return database.update(StudentContract.MarksEntry.TABLE_NAME,contentValues,s,strings);
+
+        }
         return 0;
     }
 }
