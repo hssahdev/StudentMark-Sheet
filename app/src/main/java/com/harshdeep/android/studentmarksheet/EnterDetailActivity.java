@@ -1,7 +1,13 @@
 package com.harshdeep.android.studentmarksheet;
 
 import android.content.ContentValues;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -11,13 +17,25 @@ import android.widget.Toast;
 
 import com.harshdeep.android.studentmarksheet.data.StudentContract;
 
-public class EnterDetailActivity extends AppCompatActivity {
+public class EnterDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+
+    Uri currentStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent=getIntent();
+        currentStudent=intent.getData();
+
+        if(currentStudent!=null){
+            setTitle("Edit Student");
+            getSupportLoaderManager().initLoader(0,null,this);
+        }
+
         setContentView(R.layout.activity_enter_detail);
+
+
 
         Button button=(Button)findViewById(R.id.doneEnteringDetails);
 
@@ -65,5 +83,47 @@ public class EnterDetailActivity extends AppCompatActivity {
                     Toast.makeText(EnterDetailActivity.this, "Marks can't be greater than 100!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this,currentStudent,null,null,null,null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        int  NameColumnId, RollNoColumnId, phyMarksColumnId, ChemMarksColumnId, EngMarksColumnId, MathsMarksColumnId;
+
+        NameColumnId=data.getColumnIndex(StudentContract.MarksEntry.STUDENT_NAME);
+        RollNoColumnId=data.getColumnIndex(StudentContract.MarksEntry.STUDENT_ROLLNO);
+        phyMarksColumnId=data.getColumnIndex(StudentContract.MarksEntry.MARKS_PHY);
+        ChemMarksColumnId=data.getColumnIndex(StudentContract.MarksEntry.MARKS_CHEM);
+        EngMarksColumnId=data.getColumnIndex(StudentContract.MarksEntry.MARKS_ENG);
+        MathsMarksColumnId=data.getColumnIndex(StudentContract.MarksEntry.MARKS_MATHS);
+        data.moveToNext();
+        EditText name=(EditText) findViewById(R.id.studentName);
+        name.setText(data.getString(NameColumnId));
+
+        EditText roll = findViewById(R.id.rollNo);
+        roll.setText(data.getString(RollNoColumnId));
+
+        EditText marks = findViewById(R.id.physicsMarks);
+        marks.setText(data.getString(phyMarksColumnId));
+
+        marks = findViewById(R.id.mathsMarks);
+        marks.setText(data.getString(MathsMarksColumnId));
+
+        marks = findViewById(R.id.chemMarks);
+        marks.setText(data.getString(ChemMarksColumnId));
+
+        marks = findViewById(R.id.engMarks);
+        marks.setText(data.getString(EngMarksColumnId));
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

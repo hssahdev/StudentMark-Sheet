@@ -1,8 +1,10 @@
 package com.harshdeep.android.studentmarksheet;
 
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
@@ -15,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.harshdeep.android.studentmarksheet.data.StudentContract;
@@ -67,6 +70,18 @@ public class StudentViewActivity extends AppCompatActivity implements LoaderMana
         listView.setAdapter(mAdapter);
         View emptyView = findViewById(R.id.emptyView);
         listView.setEmptyView(emptyView);
+
+        if(LoginActivity.loginDone){
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Uri studentURI = ContentUris.withAppendedId(StudentContract.MarksEntry.CONTENT_URI,l);
+                    Intent intent = new Intent(StudentViewActivity.this,EnterDetailActivity.class);
+                    intent.setData(studentURI);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     @Override
